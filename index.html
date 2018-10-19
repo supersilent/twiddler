@@ -11,14 +11,38 @@
         var $body = $('body');
         $body.html('');
 
-        var index = streams.home.length - 1;
-        while(index >= 0){
-          var tweet = streams.home[index];
-          var $tweet = $('<div></div>');
-          $tweet.text('@' + tweet.user + ': ' + tweet.message);
-          $tweet.appendTo($body);
-          index -= 1;
+        let length= streams.home.length - 1;
+        function displayTweets(){
+          length = streams.home.length - 1;
+          var index = streams.home.length - 1;
+          while(index >= 0){
+            let d = new Date();
+            let hours = ('0' + d.getHours()).slice(-2);
+            let seconds = ('0' + d.getSeconds()).slice(-2);
+            let milliseconds = ('0' + '0' + d.getMilliseconds()).slice(-3);
+            let day=('0' + d.getDate()).slice(-2);
+            let month=('0' + (d.getMonth()+1)).slice(-2);
+            let date = ` ${hours}:${seconds}:${milliseconds} ${month}-${day}-${d.getFullYear()}`;
+            var tweet = streams.home[index];
+            var $tweet = $('<div class=tweet></div>');
+            // $tweet.text('@' + tweet.user + ': ' + tweet.message);
+            $tweet.text('@' + tweet.user + ': ' + tweet.message + date);
+            $(".tweet").click(function(){
+              $(this).hide();
+            });
+            $tweet.appendTo($body);
+            index -= 1;
+
+          }
         }
+
+        displayTweets();
+
+        setInterval(function(){
+          $('div').remove('.tweet');
+          displayTweets();
+        },1);
+
 
       });
 
