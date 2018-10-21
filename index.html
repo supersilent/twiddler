@@ -10,25 +10,60 @@
       $(document).ready(function(){
         var $body = $('body');
         $body.html('');
-
         let length= streams.home.length - 1;
+        let userid='';
+
+        function dateFormat(date){
+        let d = date;
+        let hours = ('0' + d.getHours()).slice(-2);
+        let seconds = ('0' + d.getSeconds()).slice(-2);
+        let milliseconds = ('0' + '0' + d.getMilliseconds()).slice(-3);
+        let day=('0' + d.getDate()).slice(-2);
+        let month=('0' + (d.getMonth()+1)).slice(-2);
+        return ` ${hours}:${seconds}:${milliseconds} ${month}-${day}-${d.getFullYear()}`;
+        }
+
         function displayTweets(){
           length = streams.home.length - 1;
           var index = streams.home.length - 1;
           while(index >= 0){
-            let d = new Date();
-            let hours = ('0' + d.getHours()).slice(-2);
-            let seconds = ('0' + d.getSeconds()).slice(-2);
-            let milliseconds = ('0' + '0' + d.getMilliseconds()).slice(-3);
-            let day=('0' + d.getDate()).slice(-2);
-            let month=('0' + (d.getMonth()+1)).slice(-2);
-            let date = ` ${hours}:${seconds}:${milliseconds} ${month}-${day}-${d.getFullYear()}`;
             var tweet = streams.home[index];
             var $tweet = $('<div class=tweet></div>');
-            // $tweet.text('@' + tweet.user + ': ' + tweet.message);
-            $tweet.text('@' + tweet.user + ': ' + tweet.message + date);
+            $tweet.css({"background-color":"PowderBlue"
+             ,"border-style": "solid"
+             ,"padding": "10px 50px"
+             ,"margin": "10px 50px"
+             ,"border-width": "thin"
+             ,"border-radius": "10px"
+             ,"width": "500px"});
+            // $tweet.id = tweet.user;
+            $tweet.html(' <b>@' + tweet.user + '</b>' + "<br><big>" + tweet.message + "</big><br><small>" + dateFormat(tweet.created_at));
+
+            let user = tweet.user;
             $(".tweet").click(function(){
-              $(this).hide();
+              userid=tweet.user;
+              setInterval(function(){
+                $('div').remove('.tweet');
+                displayUserTweets();
+              },1);
+              function displayUserTweets(){
+                var userindex = streams.users[userid].length - 1;
+                while(userindex >= 0){
+                  var usertweet = streams.users[userid][userindex];
+                  var $usertweet = $('<div class=tweet></div>');
+                  $usertweet.html(' <b>@' + usertweet.user + '</b>' + "<br><big>" + usertweet.message + "</big><br><small>" + dateFormat(usertweet.created_at));
+                  $usertweet.css({"background-color":"PowderBlue"
+                   ,"border-style": "solid"
+                   ,"padding": "10px 50px"
+                   ,"margin": "10px 50px"
+                   ,"border-width": "thin"
+                   ,"border-radius": "10px"
+                   ,"width": "500px"});
+                  $usertweet.appendTo($body);
+                  userindex--;
+                }
+              }
+              // $(this).hide();
             });
             $tweet.appendTo($body);
             index -= 1;
@@ -39,9 +74,11 @@
         displayTweets();
 
         setInterval(function(){
-          $('div').remove('.tweet');
-          displayTweets();
-        },1);
+          if (userid==''){
+            $('div').remove('.tweet');
+            displayTweets();
+          }
+        },1000);
 
 
       });
